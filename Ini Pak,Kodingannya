@@ -1,88 +1,61 @@
 #include <iostream>
-#include <vector>
 #include <string>
-#include <map>
 
 using namespace std;
 
-class MenuItem {
-public:
+const int MAX_MENU = 4;
+
+struct MenuItem {
     string name;
     double price;
     int stock;
-
-    MenuItem(string n, double p, int s) : name(n), price(p), stock(s) {}
-
-    void updateStock(int newStock) {
-        stock = newStock;
-    }
-
-    void reduceStock(int quantity) {
-        if (stock >= quantity) {
-            stock -= quantity;
-        }
-        else {
-            cout << "Not enough stock for " << name << endl;
-        }
-    }
-
-    bool isAvailable(int quantity) {
-        return stock >= quantity;
-    }
 };
 
 class SchoolFoodService {
 private:
-    vector<MenuItem> menu;
-    map<string, int> dailySales;
-    map<string, int> menuFavorites;
+    MenuItem menu[MAX_MENU];
+    int dailySales[MAX_MENU] = {0};
+    int menuFavorites[MAX_MENU] = {0};
     string breakTime;
+    int menuSize = 0;
 
 public:
-    // Service Planning (Owner)
+    void addMenuItem(string name, double price, int stock) {
+        if (menuSize < MAX_MENU) {
+            menu[menuSize].name = name;
+            menu[menuSize].price = price;
+            menu[menuSize].stock = stock;
+            menuSize++;
+        }
+    }
+
+    void displayMenu() {
+        cout << "Menu: " << endl;
+        for (int i = 0; i < menuSize; i++) {
+            cout << menu[i].name << ": Price = " << menu[i].price << ", Stock = " << menu[i].stock << endl;
+        }
+    }
+
     void setBreakTime(string time) {
         breakTime = time;
         cout << "Break time set to: " << breakTime << endl;
     }
 
     void setMenuPrice(string itemName, double price) {
-        for (auto& item : menu) {
-            if (item.name == itemName) {
-                item.price = price;
+        for (int i = 0; i < menuSize; i++) {
+            if (menu[i].name == itemName) {
+                menu[i].price = price;
                 cout << "Price for " << itemName << " updated to: " << price << endl;
+                return;
             }
         }
     }
 
-    // Business Analysis (Owner)
-    void recordSale(string itemName, int quantity) {
-        if (dailySales.find(itemName) == dailySales.end()) {
-            dailySales[itemName] = 0;
-        }
-        dailySales[itemName] += quantity;
-    }
-
-    void displaySales() {
-        cout << "Total Sales: " << endl;
-        for (auto& sale : dailySales) {
-            cout << sale.first << ": " << sale.second << " sold" << endl;
-        }
-    }
-
-    void displayFavoriteMenu() {
-        cout << "Menu Favorites: " << endl;
-        for (auto& favorite : menuFavorites) {
-            cout << favorite.first << ": " << favorite.second << " times ordered" << endl;
-        }
-    }
-
-    // Order Handling (Staff)
     void processOrder(string itemName, int quantity) {
-        for (auto& item : menu) {
-            if (item.name == itemName && item.isAvailable(quantity)) {
-                item.reduceStock(quantity);
+        for (int i = 0; i < menuSize; i++) {
+            if (menu[i].name == itemName && menu[i].stock >= quantity) {
+                menu[i].stock -= quantity;
                 recordSale(itemName, quantity);
-                menuFavorites[itemName] += quantity;
                 cout << "Order processed for " << quantity << " " << itemName << endl;
                 return;
             }
@@ -90,25 +63,27 @@ public:
         cout << "Order could not be processed for " << itemName << endl;
     }
 
-    // Inventory Update (Staff)
-    void updateMenuItemStock(string itemName, int stock) {
-        for (auto& item : menu) {
-            if (item.name == itemName) {
-                item.updateStock(stock);
-                cout << "Stock for " << itemName << " updated to: " << stock << endl;
+    void recordSale(string itemName, int quantity) {
+        for (int i = 0; i < menuSize; i++) {
+            if (menu[i].name == itemName) {
+                dailySales[i] += quantity;
+                menuFavorites[i] += quantity;
                 return;
             }
         }
     }
 
-    void addMenuItem(string name, double price, int stock) {
-        menu.push_back(MenuItem(name, price, stock));
+    void displaySales() {
+        cout << "Total Sales: " << endl;
+        for (int i = 0; i < menuSize; i++) {
+            cout << menu[i].name << ": " << dailySales[i] << " sold" << endl;
+        }
     }
 
-    void displayMenu() {
-        cout << "Menu: " << endl;
-        for (auto& item : menu) {
-            cout << item.name << ": Price = " << item.price << ", Stock = " << item.stock << endl;
+    void displayFavoriteMenu() {
+        cout << "Menu Favorites: " << endl;
+        for (int i = 0; i < menuSize; i++) {
+            cout << menu[i].name << ": " << menuFavorites[i] << " times ordered" << endl;
         }
     }
 };
@@ -116,34 +91,26 @@ public:
 int main() {
     SchoolFoodService sfsms;
 
-    // Owner adds menu items
     sfsms.addMenuItem("Batagor Ikan", 10000.0, 50);
-    sfsms.addMenuItem("Batagor ayam", 12000.0, 30);
+    sfsms.addMenuItem("Batagor Ayam", 12000.0, 30);
     sfsms.addMenuItem("Otak-otak", 5000.0, 100);
     sfsms.addMenuItem("Siomay", 10000.0, 70);
 
-    // Display the menu
     sfsms.displayMenu();
 
-    // Owner sets break time
     sfsms.setBreakTime("12:30 PM");
 
-    // Staff processes an order
     sfsms.processOrder("Batagor Ikan", 3);
-    sfsms.processOrder("Otak-Otak", 5);
+    sfsms.processOrder("Otak-otak", 5);
 
-    // Staff updates the menu stock
-    sfsms.updateMenuItemStock("Batagor Ayam", 40);
+    sfsms.setMenuPrice("Siomay", 10000.0);
 
-    // Owner sees the total sales and favorite menu items
+    sfsms.displayMenu();
+
     sfsms.displaySales();
     sfsms.displayFavoriteMenu();
 
-    // Owner updates the price of an item
-    sfsms.setMenuPrice("Siomay", 10000.0);
-
-    // Display updated menu
-    sfsms.displayMenu();
-
     return 0;
 }
+
+
