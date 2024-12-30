@@ -1,116 +1,61 @@
 #include <iostream>
-#include <string>
-
-using namespace std;
-
-const int MAX_MENU = 4;
-
-struct MenuItem {
-    string name;
-    double price;
-    int stock;
-};
-
-class SchoolFoodService {
-private:
-    MenuItem menu[MAX_MENU];
-    int dailySales[MAX_MENU] = {0};
-    int menuFavorites[MAX_MENU] = {0};
-    string breakTime;
-    int menuSize = 0;
-
-public:
-    void addMenuItem(string name, double price, int stock) {
-        if (menuSize < MAX_MENU) {
-            menu[menuSize].name = name;
-            menu[menuSize].price = price;
-            menu[menuSize].stock = stock;
-            menuSize++;
-        }
-    }
-
-    void displayMenu() {
-        cout << "Menu: " << endl;
-        for (int i = 0; i < menuSize; i++) {
-            cout << menu[i].name << ": Price = " << menu[i].price << ", Stock = " << menu[i].stock << endl;
-        }
-    }
-
-    void setBreakTime(string time) {
-        breakTime = time;
-        cout << "Break time set to: " << breakTime << endl;
-    }
-
-    void setMenuPrice(string itemName, double price) {
-        for (int i = 0; i < menuSize; i++) {
-            if (menu[i].name == itemName) {
-                menu[i].price = price;
-                cout << "Price for " << itemName << " updated to: " << price << endl;
-                return;
-            }
-        }
-    }
-
-    void processOrder(string itemName, int quantity) {
-        for (int i = 0; i < menuSize; i++) {
-            if (menu[i].name == itemName && menu[i].stock >= quantity) {
-                menu[i].stock -= quantity;
-                recordSale(itemName, quantity);
-                cout << "Order processed for " << quantity << " " << itemName << endl;
-                return;
-            }
-        }
-        cout << "Order could not be processed for " << itemName << endl;
-    }
-
-    void recordSale(string itemName, int quantity) {
-        for (int i = 0; i < menuSize; i++) {
-            if (menu[i].name == itemName) {
-                dailySales[i] += quantity;
-                menuFavorites[i] += quantity;
-                return;
-            }
-        }
-    }
-
-    void displaySales() {
-        cout << "Total Sales: " << endl;
-        for (int i = 0; i < menuSize; i++) {
-            cout << menu[i].name << ": " << dailySales[i] << " sold" << endl;
-        }
-    }
-
-    void displayFavoriteMenu() {
-        cout << "Menu Favorites: " << endl;
-        for (int i = 0; i < menuSize; i++) {
-            cout << menu[i].name << ": " << menuFavorites[i] << " times ordered" << endl;
-        }
-    }
-};
+    using namespace std;
 
 int main() {
-    SchoolFoodService sfsms;
+    // Variabel menu
+    string namaMenu[4] = { "Batagor Ikan", "Batagor Ayam", "Otak-otak", "Siomay" };
+    int hargaMenu[4] = { 10000, 12000, 5000, 10000 };
+    int stokMenu[4] = { 50, 30, 100, 70 };
+    int terjualMenu[4] = { 0, 0, 0, 0 };
+    int favoritMenu[4] = { 0, 0, 0, 0 };
 
-    sfsms.addMenuItem("Batagor Ikan", 10000.0, 50);
-    sfsms.addMenuItem("Batagor Ayam", 12000.0, 30);
-    sfsms.addMenuItem("Otak-otak", 5000.0, 100);
-    sfsms.addMenuItem("Siomay", 10000.0, 70);
+    // Proses pesanan
+    stokMenu[0] -= 3;
+    terjualMenu[0] += 3;
+    favoritMenu[0] += 3;
 
-    sfsms.displayMenu();
+    stokMenu[2] -= 5;
+    terjualMenu[2] += 5;
+    favoritMenu[2] += 5;
 
-    sfsms.setBreakTime("12:30 PM");
+    // Tampilkan menu
+    cout << "Menu:" << endl;
+    for (int i = 0; i < 4; i++) {
+        cout << namaMenu[i] << ": Price = " << hargaMenu[i] << ", Stock = " << stokMenu[i] << endl;
+    }
 
-    sfsms.processOrder("Batagor Ikan", 3);
-    sfsms.processOrder("Otak-otak", 5);
+    // Tampilkan waktu istirahat
+    cout << "Break time set to: 12:30 PM" << endl;
 
-    sfsms.setMenuPrice("Siomay", 10000.0);
+    // Tampilkan pesanan
+    cout << "Order processed for 3 Batagor Ikan" << endl;
+    cout << "Order processed for 5 Otak-otak" << endl;
 
-    sfsms.displayMenu();
+    // Tampilkan perubahan harga
+    cout << "Price for Siomay updated to: 10000" << endl;
 
-    sfsms.displaySales();
-    sfsms.displayFavoriteMenu();
+    // Tampilkan menu lagi
+    cout << "Menu:" << endl;
+    for (int i = 0; i < 4; i++) {
+        cout << namaMenu[i] << ": Price = " << hargaMenu[i] << ", Stock = " << stokMenu[i] << endl;
+    }
+
+    // Tampilkan total penjualan
+    int totalPenjualan = 0;
+    cout << "Total Sales:" << endl;
+    for (int i = 0; i < 4; i++) {
+        cout << namaMenu[i] << ": " << terjualMenu[i] << " sold" << endl;
+        totalPenjualan += terjualMenu[i] * hargaMenu[i];
+    }
+
+    // Tampilkan menu favorit
+    cout << "Menu Favorites:" << endl;
+    for (int i = 0; i < 4; i++) {
+        cout << namaMenu[i] << ": " << favoritMenu[i] << " times ordered" << endl;
+    }
+
+    // Tampilkan total pendapatan
+    cout << "Total Pendapatan: " << totalPenjualan << endl;
 
     return 0;
 }
-
-
