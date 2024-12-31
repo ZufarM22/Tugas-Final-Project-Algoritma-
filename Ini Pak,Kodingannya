@@ -1,61 +1,155 @@
 #include <iostream>
-    using namespace std;
+#include <string>
+
+using namespace std;
+
+const int MAX_MENU = 4;
+
+string namaMenu[MAX_MENU] = { "", "", "", "" };
+double hargaMenu[MAX_MENU] = { 0.0, 0.0, 0.0, 0.0 };
+int stokMenu[MAX_MENU] = { 0, 0, 0, 0 };
+int penjualanHarian[MAX_MENU] = { 0, 0, 0, 0 };
+int menuFavorit[MAX_MENU] = { 0, 0, 0, 0 };
+string waktuIstirahat;
+
+int ukuranMenu = 0;
+
+int tambahMenu(string nama, double harga, int stok) {
+    if (ukuranMenu < MAX_MENU) {
+        namaMenu[ukuranMenu] = nama;
+        hargaMenu[ukuranMenu] = harga;
+        stokMenu[ukuranMenu] = stok;
+        ukuranMenu++;
+        return 1;  // Menandakan menu berhasil ditambahkan
+    }
+    return 0;  // Gagal menambah menu jika sudah penuh
+}
+
+int tampilMenu() {
+    cout << "Menu:" << endl;
+    for (int i = 0; i < ukuranMenu; i++) {
+        cout << namaMenu[i] << ": Harga = " << hargaMenu[i] << ", Stok = " << stokMenu[i] << endl;
+    }
+    return 1; // Menandakan menu ditampilkan
+}
+
+int aturWaktuIstirahat(string waktu) {
+    waktuIstirahat = waktu;
+    cout << "Waktu istirahat diatur ke: " << waktuIstirahat << endl;
+    return 1;
+}
+
+int ubahHargaMenu(string nama, double harga) {
+    for (int i = 0; i < ukuranMenu; i++) {
+        if (namaMenu[i] == nama) {
+            hargaMenu[i] = harga;
+            cout << "Harga untuk " << nama << " diperbarui ke: " << harga << endl;
+            return 1; // Menandakan harga berhasil diubah
+        }
+    }
+    return 0; // Menu tidak ditemukan
+}
+
+int prosesPesanan(string nama, int jumlah) {
+    for (int i = 0; i < ukuranMenu; i++) {
+        if (namaMenu[i] == nama && stokMenu[i] >= jumlah) {
+            stokMenu[i] -= jumlah;
+            penjualanHarian[i] += jumlah;
+            menuFavorit[i] += jumlah;
+            double totalHarga = hargaMenu[i] * jumlah;
+            cout << "Pesanan diproses untuk " << jumlah << " " << nama << endl;
+            cout << "Total harga: Rp " << fixed << setprecision(2) << totalHarga << endl;
+            return 1; // Pesanan diproses dengan sukses
+        }
+        else if (namaMenu[i] == nama && stokMenu[i] < jumlah) {
+            cout << "Maaf, stok " << nama << " tidak mencukupi." << endl;
+            return 0; // Stok tidak mencukupi
+        }
+    }
+    cout << "Menu tidak tersedia." << endl;
+    return 0; // Menu tidak ditemukan
+}
+
+// Break Time Service: Catat dan hitung total pesanan
+int inputPesananPelajar() {
+    string namaPesanan;
+    int jumlahPesanan;
+
+    while (true) {
+        cout << "Masukkan nama pesanan (atau 'keluar' untuk selesai): ";
+        cin >> namaPesanan;
+        if (namaPesanan == "keluar") break;
+        cout << "Masukkan jumlah pesanan: ";
+        cin >> jumlahPesanan;
+        prosesPesanan(namaPesanan, jumlahPesanan);
+    }
+    return 1; // Menandakan proses pesanan selesai
+}
+
+// Stock Control: Update stok menu
+int updateStokMenu() {
+    cout << "Update Stok Menu:" << endl;
+    for (int i = 0; i < ukuranMenu; i++) {
+        cout << "Masukkan stok terbaru untuk " << namaMenu[i] << ": ";
+        cin >> stokMenu[i];
+    }
+    return 1; // Stok menu berhasil diupdate
+}
+
+// Cek menu habis dan laporkan ke dapur
+int cekStokHabis() {
+    cout << "Menu yang habis:" << endl;
+    for (int i = 0; i < ukuranMenu; i++) {
+        if (stokMenu[i] == 0) {
+            cout << namaMenu[i] << " habis, laporkan ke dapur." << endl;
+        }
+    }
+    return 1; // Stok habis telah diperiksa
+}
+
+int tampilPenjualan() {
+    cout << "Total Penjualan:" << endl;
+    for (int i = 0; i < ukuranMenu; i++) {
+        cout << namaMenu[i] << ": " << penjualanHarian[i] << " terjual" << endl;
+    }
+    return 1; // Menampilkan total penjualan
+}
+
+int tampilMenuFavorit() {
+    cout << "Menu Favorit:" << endl;
+    for (int i = 0; i < ukuranMenu; i++) {
+        cout << namaMenu[i] << ": " << menuFavorit[i] << " kali dipesan" << endl;
+    }
+    return 1; // Menampilkan menu favorit
+}
 
 int main() {
-    // Variabel menu
-    string namaMenu[4] = { "Batagor Ikan", "Batagor Ayam", "Otak-otak", "Siomay" };
-    int hargaMenu[4] = { 10000, 12000, 5000, 10000 };
-    int stokMenu[4] = { 50, 30, 100, 70 };
-    int terjualMenu[4] = { 0, 0, 0, 0 };
-    int favoritMenu[4] = { 0, 0, 0, 0 };
+    // Menambah menu awal
+    tambahMenu("Batagor Ikan", 10000.0, 50);
+    tambahMenu("Batagor Ayam", 12000.0, 30);
+    tambahMenu("Otak-otak", 5000.0, 100);
+    tambahMenu("Siomay", 10000.0, 70);
 
-    // Proses pesanan
-    stokMenu[0] -= 3;
-    terjualMenu[0] += 3;
-    favoritMenu[0] += 3;
+    // Tampilkan menu awal
+    tampilMenu();
+    aturWaktuIstirahat("12:30 PM");
 
-    stokMenu[2] -= 5;
-    terjualMenu[2] += 5;
-    favoritMenu[2] += 5;
+    // Input pesanan pelajar
+    inputPesananPelajar();
 
-    // Tampilkan menu
-    cout << "Menu:" << endl;
-    for (int i = 0; i < 4; i++) {
-        cout << namaMenu[i] << ": Price = " << hargaMenu[i] << ", Stock = " << stokMenu[i] << endl;
-    }
+    // Ubah harga menu (contoh)
+    ubahHargaMenu("Siomay", 11000.0);
+    tampilMenu();
 
-    // Tampilkan waktu istirahat
-    cout << "Break time set to: 12:30 PM" << endl;
+    // Tampilkan penjualan dan menu favorit
+    tampilPenjualan();
+    tampilMenuFavorit();
 
-    // Tampilkan pesanan
-    cout << "Order processed for 3 Batagor Ikan" << endl;
-    cout << "Order processed for 5 Otak-otak" << endl;
+    // Update stok menu
+    updateStokMenu();
 
-    // Tampilkan perubahan harga
-    cout << "Price for Siomay updated to: 10000" << endl;
-
-    // Tampilkan menu lagi
-    cout << "Menu:" << endl;
-    for (int i = 0; i < 4; i++) {
-        cout << namaMenu[i] << ": Price = " << hargaMenu[i] << ", Stock = " << stokMenu[i] << endl;
-    }
-
-    // Tampilkan total penjualan
-    int totalPenjualan = 0;
-    cout << "Total Sales:" << endl;
-    for (int i = 0; i < 4; i++) {
-        cout << namaMenu[i] << ": " << terjualMenu[i] << " sold" << endl;
-        totalPenjualan += terjualMenu[i] * hargaMenu[i];
-    }
-
-    // Tampilkan menu favorit
-    cout << "Menu Favorites:" << endl;
-    for (int i = 0; i < 4; i++) {
-        cout << namaMenu[i] << ": " << favoritMenu[i] << " times ordered" << endl;
-    }
-
-    // Tampilkan total pendapatan
-    cout << "Total Pendapatan: " << totalPenjualan << endl;
+    // Cek stok habis dan laporkan ke dapur
+    cekStokHabis();
 
     return 0;
 }
